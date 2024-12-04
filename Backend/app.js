@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import {connection} from "./database/connection.js";
 import { errorMiddleware } from "./middlewares/errors.js";
 import fileUpload from "express-fileupload";
-import userRouter from "./routes/userRoutes.js";
+import userRouter from "./routes/userRouter.js";
 
 const app = express();
 config({path: "./config/config.env"});
