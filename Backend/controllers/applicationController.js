@@ -1,4 +1,3 @@
-import { application } from "express";
 import {catchAsyncErrors} from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errors.js";
 import { Application } from "../models/applicationSchema.js";
@@ -28,7 +27,7 @@ export const postApplication = catchAsyncErrors(async(req, res, next) => {
     }
 
     const hasAlreadyApplied = await Application.findOne({
-        "jobInfo.id": id,
+        "jobInfo.jobId": id,
         "jobSeekerInfo.id": req.user._id
     });
     if(hasAlreadyApplied){
@@ -73,8 +72,9 @@ export const postApplication = catchAsyncErrors(async(req, res, next) => {
     const application = await Application.create({
         jobSeekerInfo,
         employerInfo,
-        jobInfo
+        jobInfo,
     });
+
     res.status(201).json({
         success: true,
         message: "Application submitted",
@@ -106,5 +106,30 @@ export const jobSeekerGetAllApplication = catchAsyncErrors(async(req, res, next)
     })
 });
 export const deleteApplication = catchAsyncErrors(async(req, res, next) => {
-    
+    const {id} = req.params;
+    const application = await Application.findById(id);
+    if(!application){
+        return next(new ErrorHandler("Application not found!", 404));
+    }
+    const {role} = req.user;
+    switch (role) {
+        case "Job Seeker":
+            application.deletedBy.jobSeeker = true;
+            await application.save();
+            break;
+        case "Employer":
+            application.deletedBy.employer = true;
+            await application.save();
+            break;
+        default:
+            return next(new ErrorHandler("Invalid Role!", 203));
+            break;
+    }
+    if(application.deletedBy.employer === true && application.deletedBy.jobSeeker === true){
+        await application.deleteOne();
+    }
+    res.status(200).json({
+        success: true,
+        message: "Application deleted."
+    });
 });

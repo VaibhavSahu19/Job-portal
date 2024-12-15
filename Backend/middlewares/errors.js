@@ -5,13 +5,13 @@ class ErrorHandler extends Error{
     }
 };
 
-export const errorMiddleware = (error, res, next) => {
+export const errorMiddleware = (error, req, res, next) => {
     error.statusCode = error.statusCode || 500;
-    error.message = error.message || "Internale Server Error";
+    error.message = error.message || "Internal Server Error";
     if(error.name === "CastError"){
         const message = `Invalid ${error.path}`;
         error = new ErrorHandler(message, 400);
-    }if(error.statusCode === 11000){
+    }if(error.code === 11000){
         const message = `Duplicate ${Object.keys(error.keyValue)} entered.`;
         error = new ErrorHandler(message, 400);
     }if(error.name === "JsonwebTokenError"){

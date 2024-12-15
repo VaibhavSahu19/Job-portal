@@ -63,7 +63,7 @@ const applicationSchema = new mongoose.Schema({
     deletedBy: {
         jobSeeker: {
             type: Boolean,
-            defualt: false
+            default: false
         },
         employer: {
             type: Boolean,

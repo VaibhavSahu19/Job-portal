@@ -80,7 +80,7 @@ export const login =  catchAsyncErrors(async(req, res, next) => {
     }
     const isPasswordMatched = await user.comparePassword(password);
     if(!isPasswordMatched){
-        return next(new ErrorHandler("Invalid email or password", 400));
+        return next(new ErrorHandler("Invalid email or password (Password is wrong).", 400));
     }
     if(user.role !== role){
         return next(new ErrorHandler("Invalid role.", 400));
